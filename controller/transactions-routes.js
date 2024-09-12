@@ -1,4 +1,4 @@
-import {createTransaction} from "../service/transactions-service.js";
+import {createTransaction, getTransaction, getTransactions} from "../service/transactions-service.js";
 
 /**
  * A plugin that provide encapsulated routes
@@ -6,27 +6,9 @@ import {createTransaction} from "../service/transactions-service.js";
  * @param {Object} options plugin options, refer to https://fastify.dev/docs/latest/Reference/Plugins/#plugin-options
  */
 async function transactionsRoutes(fastify, options) {
-    const collection = fastify.mongo.db.collection('transactions')
-
-    const opts = {
-        schema: {
-            response: {
-                200: {
-                    type: 'object',
-                    properties: {
-                        hello: { type: 'string' }
-                    }
-                }
-            }
-        }
-    }
-
-    fastify.get('/', opts, async (request, reply) => {
-        return {hello: 'world'}
-    })
 
     fastify.get('/transactions', async (request, reply) => {
-        const result = await collection.find().toArray()
+        const result = await getTransactions(fastify)
         if (result.length === 0) {
             throw new Error('No documents found')
         }
@@ -34,7 +16,7 @@ async function transactionsRoutes(fastify, options) {
     })
 
     fastify.get('/transactions/:transaction', async (request, reply) => {
-        const result = await collection.findOne({transactionDesc: request.params.transactionDesc})
+        const result = await getTransaction(fastify, {transactionDesc: request.params.transactionDesc})
         if (!result) {
             throw new Error('Invalid value')
         }

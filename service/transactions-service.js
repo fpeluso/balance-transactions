@@ -1,6 +1,26 @@
 import * as categoriesService from "./categories-service.js";
 
 /**
+ * @param fastify
+ * @returns {Promise<WithId<Document>[]>}
+ */
+export async function getTransactions (fastify) {
+    const collection = fastify.mongo.db.collection('transactions')
+    return await collection.find().toArray()
+}
+
+/**
+ * @param fastify
+ * @param transaction
+ * @returns {Promise<Document & {_id: InferIdType<Document>}>}
+ */
+export async function getTransaction (fastify, transaction) {
+    const collection = fastify.mongo.db.collection('transactions')
+    return await collection.findOne(transaction)
+}
+
+
+/**
  * a function that check the request body and create a transaction
  * @param {FastifyInstance} fastify encapsulated fastify instance
  * @param {Object} body the request body object
@@ -30,7 +50,5 @@ export async function createTransaction (fastify, body) {
         await categoriesService.createCategory(fastify, categoryBody)
     }
 
-
-    const result = await collection.insertOne(transaction)
-    return result
+    return await collection.insertOne(transaction)
 }
