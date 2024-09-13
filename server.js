@@ -2,9 +2,9 @@
 
 // ESM
 import Fastify from 'fastify'
-import dbConnector from "./config/db-connector.js";
-import transactionsRoutes from './controller/transactions-routes.js'
-import categoriesRoutes from "./controller/categories-routes.js";
+import dbConnector from "./config/db-connector";
+import transactionsRoutes from './routes/transactions-routes'
+import {categoriesRoutes} from "./routes/categories-routes";
 
 const fastify = Fastify({
     logger: true
@@ -22,3 +22,5 @@ fastify.listen({ port: 3000 }, function (err, address) {
     }
     // Server is now listening on ${address}
 })
+
+//"start": "node ./dist/index.js "

@@ -1,21 +1,21 @@
-import {createCategory, getCategories, getCategory} from "../service/categories-service.js";
+import {createCategory, getCategories, getCategory} from "../services/categories-service";
+import {FastifyInstance, FastifyRequest} from "fastify";
 
 /**
  * A plugin that provide encapsulated routes
  * @param {FastifyInstance} fastify encapsulated fastify instance
- * @param {Object} options plugin options, refer to https://fastify.dev/docs/latest/Reference/Plugins/#plugin-options
  */
-async function categoriesRoutes(fastify, options) {
+export async function categoriesRoutes(fastify: FastifyInstance) {
 
     fastify.get('/categories', async (request, reply) => {
         const result = await getCategories(fastify)
-        if (result.length === 0) {
+        if (!result || result.length === 0) {
             throw new Error('No documents found')
         }
         return result
     })
 
-    fastify.get('/categories/:category', async (request, reply) => {
+    fastify.get('/categories/:category', async (request: FastifyRequest<{ Params: { category: string } }>, reply) => {
         const result = await getCategory(fastify, {category: request.params.category})
         if (!result) {
             throw new Error('Invalid value')
@@ -37,8 +37,8 @@ async function categoriesRoutes(fastify, options) {
 
     fastify.post('/category', {schema}, async (request, reply) => {
         // we can use the `request.body` object to get the data sent by the client
-        return await createCategory(fastify, {...request.body})
+        return await createCategory(fastify, {category: request.body})
     })
 }
 
-export default categoriesRoutes
+// export default categoriesRoutes
