@@ -1,4 +1,5 @@
 import {createTransaction, getTransaction, getTransactions} from "../service/transactions-service.js";
+import {updateAccounts} from "../events/update-accounts.js";
 
 /**
  * A plugin that provide encapsulated routes
@@ -44,6 +45,7 @@ async function transactionsRoutes(fastify, options) {
         // we can use the `request.body` object to get the data sent by the client
         // const resulta = await collection.insertOne({transaction: request.body})
         const result = await createTransaction(fastify, request.body)
+        await updateAccounts(fastify, request.body)
         return result
     })
 }

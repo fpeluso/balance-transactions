@@ -4,9 +4,10 @@
     "start": "fastify start server.js"
   },
   "dependencies": {
-    "@fastify/mongodb": "^8.0.0",
-    "fastify": "^4.28.0",
-    "fastify-cli": "^6.3.0",
-    "fastify-plugin": "^4.5.1"
+    "@fastify/kafka": "^3.0.0",
+    "@fastify/mongodb": "^9.0.0",
+    "fastify": "^5.0.0",
+    "fastify-cli": "^7.0.0",
+    "fastify-plugin": "^5.0.0"
   }
 }
