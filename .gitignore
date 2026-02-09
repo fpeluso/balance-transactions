@@ -4,4 +4,7 @@ node_modules
 #ide
 .idea
 
+#environment
+.env
+
 dist

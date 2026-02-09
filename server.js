@@ -1,6 +1,7 @@
 // ESM
 import Fastify from 'fastify'
 import dbConnector from "./config/db-connector.js";
+import authPlugin from "./config/auth-plugin.js";
 import transactionsRoutes from './controller/transactions-routes.js'
 import categoriesRoutes from "./controller/categories-routes.js";
 import kafkaProducer from "./config/kafka-producer.js";
@@ -10,6 +11,7 @@ const fastify = Fastify({
 })
 
 fastify.register(dbConnector)
+fastify.register(authPlugin)
 fastify.register(kafkaProducer)
 fastify.register(transactionsRoutes)
 fastify.register(categoriesRoutes)
