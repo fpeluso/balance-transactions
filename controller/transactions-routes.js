@@ -1,5 +1,6 @@
 import {createTransaction, getTransaction, getTransactions} from "../service/transactions-service.js";
 import {updateAccounts} from "../events/update-accounts.js";
+import {requireAuth} from "../config/auth-handler.js";
 
 /**
  * A plugin that provide encapsulated routes
@@ -8,16 +9,16 @@ import {updateAccounts} from "../events/update-accounts.js";
  */
 async function transactionsRoutes(fastify, options) {
 
-    fastify.get('/transactions', async (request, reply) => {
-        const result = await getTransactions(fastify)
+    fastify.get('/transactions', { preHandler: requireAuth }, async (request, reply) => {
+        const result = await getTransactions(fastify, request.user.userId)
         if (result.length === 0) {
             throw new Error('No documents found')
         }
         return result
     })
 
-    fastify.get('/transactions/:transaction', async (request, reply) => {
-        const result = await getTransaction(fastify, {transactionDesc: request.params.transactionDesc})
+    fastify.get('/transactions/:transaction', { preHandler: requireAuth }, async (request, reply) => {
+        const result = await getTransaction(fastify, request.user.userId, {transactionDesc: request.params.transactionDesc})
         if (!result) {
             throw new Error('Invalid value')
         }
@@ -41,10 +42,8 @@ async function transactionsRoutes(fastify, options) {
         body: transactionBodyJsonSchema,
     }
 
-    fastify.post('/transaction', {schema}, async (request, reply) => {
-        // we can use the `request.body` object to get the data sent by the client
-        // const resulta = await collection.insertOne({transaction: request.body})
-        const result = await createTransaction(fastify, request.body)
+    fastify.post('/transaction', { schema, preHandler: requireAuth }, async (request, reply) => {
+        const result = await createTransaction(fastify, request.user.userId, request.body)
         await updateAccounts(fastify, request.body)
         return result
     })

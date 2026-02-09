@@ -1,4 +1,5 @@
 import {createCategory, getCategories, getCategory} from "../service/categories-service.js";
+import {requireAuth} from "../config/auth-handler.js";
 
 /**
  * A plugin that provide encapsulated routes
@@ -7,16 +8,16 @@ import {createCategory, getCategories, getCategory} from "../service/categories-
  */
 async function categoriesRoutes(fastify, options) {
 
-    fastify.get('/categories', async (request, reply) => {
-        const result = await getCategories(fastify)
+    fastify.get('/categories', { preHandler: requireAuth }, async (request, reply) => {
+        const result = await getCategories(fastify, request.user.userId)
         if (result.length === 0) {
             throw new Error('No documents found')
         }
         return result
     })
 
-    fastify.get('/categories/:category', async (request, reply) => {
-        const result = await getCategory(fastify, {category: request.params.category})
+    fastify.get('/categories/:category', { preHandler: requireAuth }, async (request, reply) => {
+        const result = await getCategory(fastify, request.user.userId, {category: request.params.category})
         if (!result) {
             throw new Error('Invalid value')
         }
@@ -35,9 +36,8 @@ async function categoriesRoutes(fastify, options) {
         body: categoryBodyJsonSchema,
     }
 
-    fastify.post('/category', {schema}, async (request, reply) => {
-        // we can use the `request.body` object to get the data sent by the client
-        return await createCategory(fastify, {...request.body})
+    fastify.post('/category', { schema, preHandler: requireAuth }, async (request, reply) => {
+        return await createCategory(fastify, request.user.userId, {...request.body})
     })
 }
 
